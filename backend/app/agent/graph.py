@@ -33,6 +33,7 @@ def route_node(state: AgentState) -> Dict[str, Any]:
         "- Return a JSON object in the exact format: {\"tool\": \"<tool_name or null>\", \"args\": {<tool_args>}}\n"
         "- If 'echo' tool is selected, args should be: {\"text\": \"<text to echo>\"}\n"
         "- If 'calculator' tool is selected, args should be: {\"expression\": \"<arithmetic expression>\"}\n"
+        "- If 'rag_search' tool is selected, args should be: {\"query\": \"<search query>\"}\n"
         "- If no available tool matches the request, set \"tool\" to null and \"args\" to null or {}\n"
     )
 

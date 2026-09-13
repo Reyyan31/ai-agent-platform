@@ -2,10 +2,12 @@ from typing import Dict, Any
 from app.tools.base import Tool, ToolResult
 from app.tools.echo_tool import EchoTool
 from app.tools.calculator_tool import CalculatorTool
+from app.tools.rag_tool import RAGTool
 
 TOOL_REGISTRY: Dict[str, Tool] = {
     EchoTool.name: EchoTool(),
     CalculatorTool.name: CalculatorTool(),
+    RAGTool.name: RAGTool(),
 }
 
 
@@ -19,6 +21,7 @@ __all__ = [
     "ToolResult",
     "EchoTool",
     "CalculatorTool",
+    "RAGTool",
     "TOOL_REGISTRY",
     "get_tool_descriptions",
 ]
