@@ -3,7 +3,9 @@ from typing import Any, Optional
 import chromadb
 from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
+from openai import OpenAI
 
+from app.memory.conversation_memory import memory_collection
 from app.tools.base import Tool, ToolResult
 
 
@@ -27,6 +29,30 @@ class RAGTool(Tool):
         )
         self.collection = self.client.get_or_create_collection(name="personal_knowledge")
 
+    def _synthesize_answer(self, query: str, raw_chunks: str) -> str:
+        try:
+            client = OpenAI(
+                api_key=os.environ.get("GROQ_API_KEY", ""),
+                base_url="https://api.groq.com/openai/v1"
+            )
+            prompt = (
+                "Answer the user's question directly and concisely using only the provided context, "
+                "in 1-3 sentences, in plain conversational text with no markdown headers; "
+                "if the context doesn't actually contain an answer to the question, say so honestly instead of guessing."
+            )
+            response = client.chat.completions.create(
+                model="openai/gpt-oss-20b",
+                temperature=0,
+                messages=[
+                    {"role": "system", "content": prompt},
+                    {"role": "user", "content": f"Context:\\n{raw_chunks}\\n\\nQuestion:\\n{query}"}
+                ]
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            print(f"[RAG SYNTHESIS ERROR] {type(e).__name__}: {e}")
+            return raw_chunks
+
     def run(self, query: Optional[str] = None, **kwargs: Any) -> ToolResult:
         search_query = (
             query
@@ -43,11 +69,12 @@ class RAGTool(Tool):
 
         try:
             query_embedding = self.model.encode(search_query.strip()).tolist()
+
+            # ── Query personal_knowledge ───────────────────────────────────
             results = self.collection.query(
                 query_embeddings=[query_embedding],
                 n_results=3,
             )
-
             documents = results.get("documents", [[]])
             metadatas = results.get("metadatas", [[]])
 
@@ -61,6 +88,18 @@ class RAGTool(Tool):
                     if isinstance(m, dict) and m.get("text")
                 ]
 
+            # ── Query conversation_memory ──────────────────────────────────
+            try:
+                mem_results = memory_collection.query(
+                    query_embeddings=[query_embedding],
+                    n_results=8,
+                )
+                mem_docs = mem_results.get("documents", [[]])
+                if mem_docs and mem_docs[0]:
+                    chunk_texts.extend([doc for doc in mem_docs[0] if doc])
+            except Exception:
+                pass  # conversation_memory may be empty on first run — that's fine
+
             if not chunk_texts:
                 return ToolResult(
                     success=True,
@@ -71,7 +110,7 @@ class RAGTool(Tool):
             joined_output = "\n\n".join(chunk_texts)
             return ToolResult(
                 success=True,
-                output=joined_output,
+                output=self._synthesize_answer(search_query, joined_output),
                 error=None,
             )
 

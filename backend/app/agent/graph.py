@@ -7,6 +7,7 @@ from langgraph.graph import StateGraph, END
 
 from app.agent.state import AgentState
 from app.agent.intent_classifier import classify_intent
+from app.memory.conversation_memory import save_to_memory
 from app.tools import TOOL_REGISTRY, get_tool_descriptions
 
 load_dotenv()
@@ -37,6 +38,9 @@ def _build_fast_path_plan(label: str, user_input: str) -> List[Dict[str, Any]]:
 def route_node(state: AgentState) -> Dict[str, Any]:
     """Generates an execution plan (list of steps) for the user's input."""
     user_input = state.get("user_input", "")
+
+    # ── Persist every user turn to conversation memory ────────────────────
+    save_to_memory(user_input)
 
     # ── Classifier fast-path ───────────────────────────────────────────────
     classifier_result = classify_intent(user_input)
@@ -76,6 +80,8 @@ def route_node(state: AgentState) -> Dict[str, Any]:
         "  - 'rag_search': {\"query\": \"<search query>\"}\n"
         "  - 'code_helper': {\"problem\": \"<coding problem or task description>\", \"language\": \"<optional, defaults to python>\"}\n"
         "  - 'create_document': {\"format\": \"docx|pdf\", \"filename\": \"<filename>\", \"content\": \"<optional initial content>\"}\n"
+        "- Never answer a question directly yourself or invent an answer. If the user is asking a question, asking for information, or asking what you know about something, you must use 'rag_search' to look it up — do not use 'echo' to state a made-up answer.\n"
+        "- Only use 'echo' when the user explicitly asks you to repeat, echo, or restate specific text they provided.\n"
         "- If no tool is appropriate, return {\"steps\": []}.\n\n"
         "Example Two-Step Plan for 'Create a Word document summary of my work experience':\n"
         "{\n"
