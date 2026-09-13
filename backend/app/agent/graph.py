@@ -34,6 +34,7 @@ def route_node(state: AgentState) -> Dict[str, Any]:
         "- If 'echo' tool is selected, args should be: {\"text\": \"<text to echo>\"}\n"
         "- If 'calculator' tool is selected, args should be: {\"expression\": \"<arithmetic expression>\"}\n"
         "- If 'rag_search' tool is selected, args should be: {\"query\": \"<search query>\"}\n"
+        "- If 'create_document' tool is selected, args should be: {\"content\": \"<content with ## headings and - bullets>\", \"format\": \"docx|pdf\", \"filename\": \"<filename>\"}\n"
         "- If no available tool matches the request, set \"tool\" to null and \"args\" to null or {}\n"
     )
 
