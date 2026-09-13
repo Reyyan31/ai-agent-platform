@@ -4,12 +4,14 @@ from app.tools.echo_tool import EchoTool
 from app.tools.calculator_tool import CalculatorTool
 from app.tools.rag_tool import RAGTool
 from app.tools.document_tool import DocumentTool
+from app.tools.code_helper_tool import CodeHelperTool
 
 TOOL_REGISTRY: Dict[str, Tool] = {
     EchoTool.name: EchoTool(),
     CalculatorTool.name: CalculatorTool(),
     RAGTool.name: RAGTool(),
     DocumentTool.name: DocumentTool(),
+    CodeHelperTool.name: CodeHelperTool(),
 }
 
 
@@ -25,6 +27,7 @@ __all__ = [
     "CalculatorTool",
     "RAGTool",
     "DocumentTool",
+    "CodeHelperTool",
     "TOOL_REGISTRY",
     "get_tool_descriptions",
 ]

@@ -1,0 +1,201 @@
+text,label
+"repeat this back to me: good morning",echo
+"echo the phrase hello there",echo
+"say this exactly as I typed it",echo
+"just repeat what I say",echo
+"can you echo my message",echo
+"restate this sentence for me",echo
+"parrot back what I just wrote",echo
+"echo: testing one two three",echo
+"say back ""see you tomorrow""",echo
+"repeat after me: the sky is blue",echo
+"can you just mirror what I type",echo
+"echo this text word for word",echo
+"give me back exactly what I said",echo
+"repeat: quarterly report is due friday",echo
+"copy this text back to me",echo
+"say exactly what I just typed, nothing else",echo
+"echo back ""meeting moved to 3pm""",echo
+"repeat my last message verbatim",echo
+"just say what I say, don't change anything",echo
+"can you parrot this phrase back",echo
+"echo ""system check complete""",echo
+"repeat this line: status ok",echo
+"say this back to me character for character",echo
+"echo my input without changing it",echo
+"repeat verbatim: the deployment succeeded",echo
+"just bounce this text back at me",echo
+"can you print exactly what I type",echo
+"echo test 123",echo
+"repeat this string back: hello world",echo
+"say it back the same way I wrote it",echo
+"echo: all systems nominal",echo
+"repeat exactly, don't paraphrase: build passed",echo
+"can you just reflect my message back",echo
+"say back what I wrote above",echo
+"echo the following line unchanged",echo
+"repeat this back word for word: task complete",echo
+"just give me an exact copy of what I typed",echo
+"echo ""hello from the other side""",echo
+"repeat this input with no changes",echo
+"say it back exactly, no summarizing",echo
+"what is 45 plus 12",calculator
+"calculate 8 times 7",calculator
+"what's 100 divided by 4",calculator
+"solve 23 minus 9",calculator
+"do the math on 15 * 3 + 2",calculator
+"what is the square of 12 (12*12)",calculator
+"compute 500 / 25",calculator
+"add 45 and 78 for me",calculator
+"what's 9 squared",calculator
+"how much is 340 minus 158",calculator
+"multiply 24 by 6",calculator
+"what's the sum of 12, 45, and 8",calculator
+"divide 900 by 15",calculator
+"what is 7 to the power of 3",calculator
+"can you subtract 88 from 200",calculator
+"what's 15% of 240",calculator
+"calculate the average of 10, 20, and 30",calculator
+"how much is 3.5 times 4",calculator
+"what is 1000 minus 347",calculator
+"add up 22 + 58 + 91",calculator
+"what's 144 divided by 12",calculator
+"compute 2 to the 10th power",calculator
+"what is 500 * 0.2",calculator
+"how many is 6 dozen",calculator
+"what's the square root of 81",calculator
+"calculate 17 + 29 - 5",calculator
+"what is 60 divided by 8",calculator
+"multiply 3.14 by 2",calculator
+"what's 250 plus 75 minus 10",calculator
+"how much change from $50 if I spend $23.75",calculator
+"do 12 * 12 * 12 for me",calculator
+"what is 999 divided by 3",calculator
+"calculate compound interest on 1000 at 5% for 2 years",calculator
+"what's 7 times 8 minus 4",calculator
+"add these numbers: 4, 8, 15, 16, 23, 42",calculator
+"what is 45.5 + 12.25",calculator
+"how much is 30% off of 80",calculator
+"compute 2^8",calculator
+"what's 1024 divided by 2",calculator
+"calculate 5 factorial",calculator
+"what does my resume say about kubernetes",rag_search
+"tell me about my work experience",rag_search
+"what backend frameworks do I know",rag_search
+"search my background for AWS experience",rag_search
+"what did I do at Nodescale",rag_search
+"summarize my technical skills",rag_search
+"do I have experience with vector databases",rag_search
+"what projects have I built before",rag_search
+"pull up info about my devops background",rag_search
+"what does my cv say about my education",rag_search
+"have I worked with terraform before",rag_search
+"what companies have I worked at",rag_search
+"search my notes for anything about langchain",rag_search
+"what's in my about_me file about python",rag_search
+"do I have any experience with docker",rag_search
+"what did I study in university",rag_search
+"find anything I've written about ci/cd pipelines",rag_search
+"what's my background in cloud infrastructure",rag_search
+"have I mentioned django anywhere in my notes",rag_search
+"what does my profile say about leadership experience",rag_search
+"search my knowledge base for react experience",rag_search
+"what certifications do I have listed",rag_search
+"have I worked on any machine learning projects",rag_search
+"what does my background say about node.js",rag_search
+"find my experience with postgresql",rag_search
+"what have I said about my devops work",rag_search
+"do my notes mention any startup experience",rag_search
+"what's documented about my kubernetes work",rag_search
+"search for mentions of my current job title",rag_search
+"what skills are listed in my profile",rag_search
+"have I written anything about api design",rag_search
+"what does my info say about team size I've managed",rag_search
+"find references to my javascript experience",rag_search
+"what's in my notes about system design",rag_search
+"search my background for any AI experience",rag_search
+"what does my file say about my years of experience",rag_search
+"have I mentioned linux administration anywhere",rag_search
+"what projects involved database design",rag_search
+"search for what I know about microservices",rag_search
+"what does my personal knowledge base say about me",rag_search
+"create a word document about my skills",create_document
+"write a pdf report on binary trees",create_document
+"generate a docx summary of this project",create_document
+"make me a pdf for this assignment",create_document
+"save this as a word file",create_document
+"create a report document about databases",create_document
+"write up a pdf on my resume",create_document
+"generate a document summarizing my experience",create_document
+"put this into a word doc",create_document
+"make a pdf version of my notes",create_document
+"write a formal report as a docx",create_document
+"create a document with my project overview",create_document
+"export this summary as a pdf",create_document
+"draft a word document about kubernetes basics",create_document
+"generate a pdf explaining rag pipelines",create_document
+"write a one-page docx about my background",create_document
+"create a summary report and save as pdf",create_document
+"make a document out of this conversation",create_document
+"turn this into a downloadable word file",create_document
+"write a report on vector databases as a pdf",create_document
+"create a docx with headings and bullet points about my skills",create_document
+"save my project notes as a word document",create_document
+"generate a formatted pdf summary",create_document
+"write this up as a proper document",create_document
+"create a resume draft as a docx",create_document
+"make a pdf explainer on langgraph",create_document
+"put together a word doc covering my experience",create_document
+"export my notes into a pdf file",create_document
+"create a document titled ""project overview""",create_document
+"draft a report about my devops background as pdf",create_document
+"write a docx cover letter draft",create_document
+"generate a project summary document",create_document
+"make this into a formatted word file",create_document
+"create a pdf study guide on neural networks",create_document
+"write a report document on my fine-tuning work",create_document
+"save this explanation as a downloadable docx",create_document
+"generate a formal pdf write-up",create_document
+"create a document summarizing today's progress",create_document
+"write my bio as a word document",create_document
+"make a pdf handout on tool registries",create_document
+"write a function to reverse a string",code_helper
+"generate python code for bubble sort",code_helper
+"help me debug this loop",code_helper
+"write a javascript function to check if a number is prime",code_helper
+"create code for a binary search algorithm",code_helper
+"how do I implement a linked list in python",code_helper
+"fix this recursive function",code_helper
+"write code to sort a list of dictionaries",code_helper
+"help me with my data structures assignment code",code_helper
+"generate a sql query to join two tables",code_helper
+"write a python script to read a csv file",code_helper
+"help me fix this indexerror",code_helper
+"generate code for a stack implementation",code_helper
+"write a function that checks for palindromes",code_helper
+"how do I write a decorator in python",code_helper
+"create a class for a simple bank account",code_helper
+"write code to merge two sorted arrays",code_helper
+"help me understand why this function returns none",code_helper
+"generate a regex to validate email addresses",code_helper
+"write a python script to rename files in a folder",code_helper
+"how do I implement quicksort",code_helper
+"debug why my api call is returning a 500",code_helper
+"write code for a simple rest endpoint in fastapi",code_helper
+"generate a function to flatten a nested list",code_helper
+"help me write unit tests for this function",code_helper
+"how do I connect to a postgres database in python",code_helper
+"write a script to scrape a webpage with beautifulsoup",code_helper
+"create a function that finds duplicates in a list",code_helper
+"generate code for a basic queue data structure",code_helper
+"help me convert this for loop into a list comprehension",code_helper
+"write a function to check balanced parentheses",code_helper
+"how do I handle exceptions properly in this code",code_helper
+"generate a python script to parse json",code_helper
+"write code for depth first search on a graph",code_helper
+"help me optimize this slow nested loop",code_helper
+"create a function to calculate fibonacci numbers",code_helper
+"write a script to automate sending emails",code_helper
+"how do I implement a hash map from scratch",code_helper
+"generate code to validate a password against rules",code_helper
+"help me refactor this messy function into smaller pieces",code_helper

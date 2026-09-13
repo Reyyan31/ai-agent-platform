@@ -6,6 +6,7 @@ from openai import OpenAI
 from langgraph.graph import StateGraph, END
 
 from app.agent.state import AgentState
+from app.agent.intent_classifier import classify_intent
 from app.tools import TOOL_REGISTRY, get_tool_descriptions
 
 load_dotenv()
@@ -17,9 +18,44 @@ client = OpenAI(
 )
 
 
+# Labels that can be handled directly without an LLM round-trip
+_FAST_PATH_LABELS = {"echo", "rag_search", "code_helper"}
+_FAST_PATH_CONFIDENCE = 0.90
+
+
+def _build_fast_path_plan(label: str, user_input: str) -> List[Dict[str, Any]]:
+    """Returns a single-step plan for classifier fast-path labels."""
+    if label == "echo":
+        return [{"tool": "echo", "args": {"text": user_input}}]
+    if label == "rag_search":
+        return [{"tool": "rag_search", "args": {"query": user_input}}]
+    if label == "code_helper":
+        return [{"tool": "code_helper", "args": {"problem": user_input, "language": "python"}}]
+    return []
+
+
 def route_node(state: AgentState) -> Dict[str, Any]:
     """Generates an execution plan (list of steps) for the user's input."""
     user_input = state.get("user_input", "")
+
+    # ── Classifier fast-path ───────────────────────────────────────────────
+    classifier_result = classify_intent(user_input)
+    label      = classifier_result["label"]
+    confidence = classifier_result["confidence"]
+
+    if label in _FAST_PATH_LABELS and confidence >= _FAST_PATH_CONFIDENCE:
+        print(f"[CLASSIFIER FAST-PATH] label={label} confidence={confidence:.2f}")
+        plan = _build_fast_path_plan(label, user_input)
+        first_step = plan[0] if plan else {}
+        return {
+            "plan": plan,
+            "step_results": [],
+            "selected_tool": first_step.get("tool"),
+            "tool_args": first_step.get("args", {}),
+        }
+
+    print(f"[LLM ROUTING] classifier_label={label} confidence={confidence:.2f} (below threshold or unsupported for fast-path)")
+
     tool_descriptions = get_tool_descriptions()
 
     tools_summary = "\n".join(
@@ -38,6 +74,7 @@ def route_node(state: AgentState) -> Dict[str, Any]:
         "  - 'echo': {\"text\": \"<text to echo>\"}\n"
         "  - 'calculator': {\"expression\": \"<arithmetic expression>\"}\n"
         "  - 'rag_search': {\"query\": \"<search query>\"}\n"
+        "  - 'code_helper': {\"problem\": \"<coding problem or task description>\", \"language\": \"<optional, defaults to python>\"}\n"
         "  - 'create_document': {\"format\": \"docx|pdf\", \"filename\": \"<filename>\", \"content\": \"<optional initial content>\"}\n"
         "- If no tool is appropriate, return {\"steps\": []}.\n\n"
         "Example Two-Step Plan for 'Create a Word document summary of my work experience':\n"
