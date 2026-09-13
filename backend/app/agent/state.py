@@ -1,4 +1,4 @@
-from typing import TypedDict, Optional, Dict, Any
+from typing import TypedDict, Optional, Dict, Any, List
 
 
 class AgentState(TypedDict):
@@ -7,3 +7,5 @@ class AgentState(TypedDict):
     tool_args: Optional[dict]
     tool_output: Optional[str]
     final_response: Optional[str]
+    plan: Optional[List[Dict[str, Any]]]
+    step_results: Optional[List[str]]

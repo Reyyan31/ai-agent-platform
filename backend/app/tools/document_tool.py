@@ -49,7 +49,9 @@ class DocumentTool(Tool):
                     line = raw_line.strip()
                     if not line:
                         continue
-                    if line.startswith("## "):
+                    if line.startswith("### "):
+                        doc.add_heading(line[4:].strip(), level=2)
+                    elif line.startswith("## "):
                         doc.add_heading(line[3:].strip(), level=1)
                     elif line.startswith("- "):
                         doc.add_paragraph(line[2:].strip(), style="List Bullet")
@@ -73,7 +75,10 @@ class DocumentTool(Tool):
                     line = raw_line.strip()
                     if not line:
                         continue
-                    if line.startswith("## "):
+                    if line.startswith("### "):
+                        story.append(Paragraph(line[4:].strip(), styles["Heading2"]))
+                        story.append(Spacer(1, 6))
+                    elif line.startswith("## "):
                         story.append(Paragraph(line[3:].strip(), styles["Heading1"]))
                         story.append(Spacer(1, 8))
                     elif line.startswith("- "):
