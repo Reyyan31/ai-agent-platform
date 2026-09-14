@@ -12,8 +12,8 @@ from app.tools.base import Tool, ToolResult
 class RAGTool(Tool):
     name: str = "rag_search"
     description: str = (
-        "Answers questions about the user's background, resume, work experience, "
-        "or personal notes by searching their personal knowledge base."
+        "Answers questions about the user's background, resume, or work experience, AND recalls any facts, preferences, or information the user has previously told the agent in conversation (e.g. 'what did I say my favorite X was', 'what's my Y'). "
+        "Use this any time the user is asking the agent to recall something specific they've shared, not just resume questions."
     )
 
     def __init__(self, chroma_dir: Optional[str] = None):
@@ -92,11 +92,26 @@ class RAGTool(Tool):
             try:
                 mem_results = memory_collection.query(
                     query_embeddings=[query_embedding],
-                    n_results=8,
+                    n_results=10,
+                    include=["documents", "metadatas"],
                 )
                 mem_docs = mem_results.get("documents", [[]])
+                mem_metas = mem_results.get("metadatas", [[]])
                 if mem_docs and mem_docs[0]:
-                    chunk_texts.extend([doc for doc in mem_docs[0] if doc])
+                    pairs = list(zip(
+                        mem_docs[0],
+                        mem_metas[0] if (mem_metas and mem_metas[0]) else [{}] * len(mem_docs[0])
+                    ))
+                    pairs = [(doc, meta) for doc, meta in pairs if doc]
+                    pairs.sort(
+                        key=lambda x: x[1].get("timestamp", "") if isinstance(x[1], dict) else "",
+                        reverse=True
+                    )
+                    top_pairs = pairs[:5]
+                    if top_pairs:
+                        top_ts = top_pairs[0][1].get("timestamp", "unknown") if isinstance(top_pairs[0][1], dict) else "unknown"
+                        print(f"[RAG MEMORY] top memory result timestamp: {top_ts}")
+                    chunk_texts.extend([doc for doc, _ in top_pairs])
             except Exception:
                 pass  # conversation_memory may be empty on first run — that's fine
 

@@ -70,6 +70,9 @@ def route_node(state: AgentState) -> Dict[str, Any]:
             "step_results": [],
             "selected_tool": first_step.get("tool"),
             "tool_args": first_step.get("args", {}),
+            "classifier_label": None,
+            "classifier_confidence": None,
+            "routing_path": "direct_answer",
         }
 
     # ── Classifier fast-path ───────────────────────────────────────────────
@@ -86,6 +89,9 @@ def route_node(state: AgentState) -> Dict[str, Any]:
             "step_results": [],
             "selected_tool": first_step.get("tool"),
             "tool_args": first_step.get("args", {}),
+            "classifier_label": label,
+            "classifier_confidence": confidence,
+            "routing_path": "fast_path",
         }
 
     print(f"[LLM ROUTING] classifier_label={label} confidence={confidence:.2f} (below threshold or unsupported for fast-path)")
@@ -105,7 +111,7 @@ def route_node(state: AgentState) -> Dict[str, Any]:
         "- If a single tool is needed, return a 1-item list in 'steps'.\n"
         "- If a request requires background information before writing a document, create a multi-step plan.\n"
         "- Use web_research for questions about current events, external facts, or anything not about the user's personal background/documents.\n"
-        "- Use rag_search only for questions about the user themselves.\n"
+        "- Use rag_search for questions about the user's background, resume, work experience, OR any personal facts, preferences, or information the user has previously stated (e.g., 'what did I say my favorite X was', 'what's my Y', nicknames, IDs, plans). Use rag_search whenever the user asks to recall a personal fact they previously stated, even casually — not just resume/background questions.\n"
         "- Tool argument formats:\n"
         "  - 'echo': {\"text\": \"<text to echo>\"}\n"
         "  - 'calculator': {\"expression\": \"<arithmetic expression>\"}\n"
@@ -156,12 +162,39 @@ def route_node(state: AgentState) -> Dict[str, Any]:
         print(f"[ROUTING ERROR] {type(e).__name__}: {e}")
         plan = []
 
+    # ── No-tool-match: conversational fallback ─────────────────────────────
+    if not plan:
+        print("[DIRECT ANSWER PATH] triggered for no-tool-match conversational input")
+        conv_system_prompt = (
+            "You are a helpful AI agent assistant. The user said something conversational or a general "
+            "greeting that doesn't require any of your tools (calculator, document creation, code help, "
+            "research, or knowledge lookup). Respond naturally and briefly, and if appropriate, mention "
+            "in passing what kinds of things you can help with."
+        )
+        try:
+            conv_response = client.chat.completions.create(
+                model="openai/gpt-oss-20b",
+                temperature=0.3,
+                messages=[
+                    {"role": "system", "content": conv_system_prompt},
+                    {"role": "user", "content": user_input},
+                ],
+            )
+            conv_answer = conv_response.choices[0].message.content or ""
+        except Exception as e:
+            print(f"[DIRECT ANSWER ERROR] {type(e).__name__}: {e}")
+            conv_answer = "I'm here to help! You can ask me to research topics, run calculations, help with code, or search your personal knowledge base."
+        plan = [{"tool": "echo", "args": {"text": conv_answer}}]
+
     first_step = plan[0] if plan else {}
     return {
         "plan": plan,
         "step_results": [],
         "selected_tool": first_step.get("tool"),
         "tool_args": first_step.get("args", {}),
+        "classifier_label": label,
+        "classifier_confidence": confidence,
+        "routing_path": "llm_routing",
     }
 
 
@@ -253,6 +286,11 @@ def execute_step(state: AgentState) -> Dict[str, Any]:
             "tool_output": None,
             "final_response": state.get("final_response")
             or f"No steps executed for input: '{state.get('user_input', '')}'",
+            "classifier_label": state.get("classifier_label"),
+            "classifier_confidence": state.get("classifier_confidence"),
+            "routing_path": state.get("routing_path"),
+            "reflection_valid": state.get("reflection_valid"),
+            "reflection_reason": state.get("reflection_reason"),
         }
 
     current_step = remaining_plan.pop(0)
@@ -276,8 +314,12 @@ def execute_step(state: AgentState) -> Dict[str, Any]:
         output_str = f"Tool '{tool_name}' not found or unavailable."
         final_response = f"No valid tool was found for step: '{tool_name}'"
         step_results.append(output_str)
+        reflection_valid = None
+        reflection_reason = None
     else:
         tool = TOOL_REGISTRY[tool_name]
+        reflection_valid = None
+        reflection_reason = None
         try:
             result = tool.run(**tool_args)
             if result.success:
@@ -295,6 +337,8 @@ def execute_step(state: AgentState) -> Dict[str, Any]:
                 
                 reflection_result = reflect_on_result(state.get("user_input", ""), tool_name, output_str, source_context=source_context)
                 print(f"[REFLECTION] valid={reflection_result['valid']} reason={reflection_result['reason']}")
+                reflection_valid = reflection_result.get("valid", True)
+                reflection_reason = reflection_result.get("reason", "")
             else:
                 output_str = f"Error: {result.error}"
                 final_response = f"Tool '{tool_name}' execution error: {result.error}"
@@ -311,6 +355,8 @@ def execute_step(state: AgentState) -> Dict[str, Any]:
         "tool_args": tool_args,
         "tool_output": output_str,
         "final_response": final_response,
+        "reflection_valid": reflection_valid,
+        "reflection_reason": reflection_reason,
     }
 
 
