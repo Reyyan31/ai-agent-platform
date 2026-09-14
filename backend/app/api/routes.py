@@ -1,7 +1,8 @@
 import os
 import uuid
+import secrets
 from typing import Optional
-from fastapi import APIRouter, Form, File, UploadFile
+from fastapi import APIRouter, Form, File, UploadFile, HTTPException, Depends, Header
 from pydantic import BaseModel
 
 from app.agent.graph import agent_graph
@@ -10,19 +11,23 @@ from app.tools.ocr_tool import OCRTool
 router = APIRouter()
 
 
-class AgentRequest(BaseModel):
-    message: str
-
-
 class AgentResponse(BaseModel):
     tool_used: Optional[str] = None
     response: str
 
 
+def verify_api_key(x_api_key: str = Header(None)):
+    """Verify the API key against the configured API_KEY."""
+    expected_key = os.getenv("API_KEY")
+    if not x_api_key or x_api_key != expected_key:
+        raise HTTPException(status_code=401, detail="Invalid or missing API key")
+
+
 @router.post("/agent/run", response_model=AgentResponse)
 async def run_agent(
-    message: str = Form(...),
+    message: str = Form(min_length=1, description="User message to the agent"),
     image: Optional[UploadFile] = File(None),
+    _: None = Depends(verify_api_key),
 ) -> AgentResponse:
     user_input = message
     
