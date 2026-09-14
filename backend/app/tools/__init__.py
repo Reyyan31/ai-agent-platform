@@ -5,6 +5,8 @@ from app.tools.calculator_tool import CalculatorTool
 from app.tools.rag_tool import RAGTool
 from app.tools.document_tool import DocumentTool
 from app.tools.code_helper_tool import CodeHelperTool
+from app.tools.web_research_tool import WebResearchTool
+from app.tools.ocr_tool import OCRTool
 
 TOOL_REGISTRY: Dict[str, Tool] = {
     EchoTool.name: EchoTool(),
@@ -12,6 +14,8 @@ TOOL_REGISTRY: Dict[str, Tool] = {
     RAGTool.name: RAGTool(),
     DocumentTool.name: DocumentTool(),
     CodeHelperTool.name: CodeHelperTool(),
+    WebResearchTool.name: WebResearchTool(),
+    OCRTool.name: OCRTool(),
 }
 
 
@@ -28,6 +32,8 @@ __all__ = [
     "RAGTool",
     "DocumentTool",
     "CodeHelperTool",
+    "WebResearchTool",
+    "OCRTool",
     "TOOL_REGISTRY",
     "get_tool_descriptions",
 ]
